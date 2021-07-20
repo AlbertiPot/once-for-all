@@ -41,9 +41,9 @@ class DataProvider:
 	def random_sample_valid_set(train_size, valid_size):
 		assert train_size > valid_size
 
-		g = torch.Generator()
-		g.manual_seed(DataProvider.VALID_SEED)  # set random seed before sampling validation set
-		rand_indexes = torch.randperm(train_size, generator=g).tolist()
+		g = torch.Generator()													# 生成一个操作随机数的实例，以调用manual_seed 和 initial_seed, 一般可以直接使用 torch.Generator
+		g.manual_seed(DataProvider.VALID_SEED)  								# set random seed before sampling validation set
+		rand_indexes = torch.randperm(train_size, generator=g).tolist()			# 从0 ~ train_size-1 中生成一个index，以划定训练集和验证集
 
 		valid_indexes = rand_indexes[:valid_size]
 		train_indexes = rand_indexes[valid_size:]
@@ -51,6 +51,6 @@ class DataProvider:
 
 	@staticmethod
 	def labels_to_one_hot(n_classes, labels):
-		new_labels = np.zeros((labels.shape[0], n_classes), dtype=np.float32)
-		new_labels[range(labels.shape[0]), labels] = np.ones(labels.shape)
+		new_labels = np.zeros((labels.shape[0], n_classes), dtype=np.float32)	# 全0矩阵，[样本数 × 类数]
+		new_labels[range(labels.shape[0]), labels] = np.ones(labels.shape)		# 标签对应位置的为1
 		return new_labels

@@ -35,12 +35,12 @@ class DynamicSeparableConv2d(nn.Module):
 			# register scaling parameters
 			# 7to5_matrix, 5to3_matrix
 			scale_params = {}
-			for i in range(len(self._ks_set) - 1):
+			for i in range(len(self._ks_set) - 1):												# 遍历0和1
 				ks_small = self._ks_set[i]
 				ks_larger = self._ks_set[i + 1]
-				param_name = '%dto%d' % (ks_larger, ks_small)
+				param_name = '%dto%d' % (ks_larger, ks_small)									# 5to3，7to5
 				# noinspection PyArgumentList
-				scale_params['%s_matrix' % param_name] = Parameter(torch.eye(ks_small ** 2))
+				scale_params['%s_matrix' % param_name] = Parameter(torch.eye(ks_small ** 2))	# 生成3×3，5×5转换矩阵
 			for name, param in scale_params.items():
 				self.register_parameter(name, param)
 
@@ -53,9 +53,9 @@ class DynamicSeparableConv2d(nn.Module):
 		start, end = sub_filter_start_end(max_kernel_size, kernel_size)
 		filters = self.conv.weight[:out_channel, :in_channel, start:end, start:end]
 		if self.KERNEL_TRANSFORM_MODE is not None and kernel_size < max_kernel_size:
-			start_filter = self.conv.weight[:out_channel, :in_channel, :, :]  # start with max kernel
-			for i in range(len(self._ks_set) - 1, 0, -1):
-				src_ks = self._ks_set[i]
+			start_filter = self.conv.weight[:out_channel, :in_channel, :, :]  					# start with max kernel
+			for i in range(len(self._ks_set) - 1, 0, -1):										# range(2,0,-1) step =-1即2，1
+				src_ks = self._ks_set[i]														# _ks_set = {3,5,7}
 				if src_ks <= kernel_size:
 					break
 				target_ks = self._ks_set[i - 1]
@@ -78,7 +78,7 @@ class DynamicSeparableConv2d(nn.Module):
 			kernel_size = self.active_kernel_size
 		in_channel = x.size(1)
 
-		filters = self.get_active_filter(in_channel, kernel_size).contiguous()
+		filters = self.get_active_filter(in_channel, kernel_size).contiguous()					# 通过active_kernel_size，调用转换矩阵使得ks变小
 
 		padding = get_same_padding(kernel_size)
 		filters = self.conv.weight_standardization(filters) if isinstance(self.conv, MyConv2d) else filters

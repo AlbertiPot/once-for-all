@@ -52,18 +52,18 @@ if args.gpu == 'all':
 else:
     device_list = [int(_) for _ in args.gpu.split(',')]
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-args.batch_size = args.batch_size * max(len(device_list), 1)
+args.batch_size = args.batch_size * max(len(device_list), 1)                            # batch_size是parser中per_gpu的size乘上总gpu数量
 ImagenetDataProvider.DEFAULT_PATH = args.path
 
-ofa_network = ofa_net(args.net, pretrained=True)
+ofa_network = ofa_net(args.net, pretrained=True)                                        # 初始化ofa supernet
 run_config = ImagenetRunConfig(test_batch_size=args.batch_size, n_worker=args.workers)
 
 """ Randomly sample a sub-network, 
     you can also manually set the sub-network using: 
         ofa_network.set_active_subnet(ks=7, e=6, d=4) 
 """
-ofa_network.sample_active_subnet()
-subnet = ofa_network.get_active_subnet(preserve_weight=True)
+ofa_network.sample_active_subnet()                                                      # 如果不指定参数ks，e，d，是random采样
+subnet = ofa_network.get_active_subnet(preserve_weight=True)                            # 根据采样后的参数设定子网
 
 """ Test sampled subnet 
 """

@@ -39,41 +39,41 @@ class ImagenetDataProvider(DataProvider):
 			MyRandomResizedCrop.ACTIVE_SIZE = max(self.image_size)
 
 			for img_size in self.image_size:
-				self._valid_transform_dict[img_size] = self.build_valid_transform(img_size)
-			self.active_img_size = max(self.image_size)  # active resolution for test
-			valid_transforms = self._valid_transform_dict[self.active_img_size]
-			train_loader_class = MyDataLoader  # randomly sample image size for each batch of training image
+				self._valid_transform_dict[img_size] = self.build_valid_transform(img_size)					# 构建一个数据增广的字典，每一个size尺度对应一个torch.transforms的对象
+			self.active_img_size = max(self.image_size)  													# active resolution for test
+			valid_transforms = self._valid_transform_dict[self.active_img_size]								# 用最大的激活image尺度对应的transform做增广方法
+			train_loader_class = MyDataLoader  																# randomly sample image size for each batch of training image
 		else:
 			self.active_img_size = self.image_size
 			valid_transforms = self.build_valid_transform()
 			train_loader_class = torch.utils.data.DataLoader
 
-		train_dataset = self.train_dataset(self.build_train_transform())
+		train_dataset = self.train_dataset(self.build_train_transform())									# 训练dataset的构建
 
 		if valid_size is not None:
 			if not isinstance(valid_size, int):
 				assert isinstance(valid_size, float) and 0 < valid_size < 1
 				valid_size = int(len(train_dataset) * valid_size)
 
-			valid_dataset = self.train_dataset(valid_transforms)
-			train_indexes, valid_indexes = self.random_sample_valid_set(len(train_dataset), valid_size)
+			valid_dataset = self.train_dataset(valid_transforms)											# 验证集dataset的构建
+			train_indexes, valid_indexes = self.random_sample_valid_set(len(train_dataset), valid_size)		# 获取train和val训练数据的下标索引
 
 			if num_replicas is not None:
-				train_sampler = MyDistributedSampler(train_dataset, num_replicas, rank, True, np.array(train_indexes))
+				train_sampler = MyDistributedSampler(train_dataset, num_replicas, rank, True, np.array(train_indexes))	# 分布式sampler
 				valid_sampler = MyDistributedSampler(valid_dataset, num_replicas, rank, True, np.array(valid_indexes))
 			else:
-				train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indexes)
+				train_sampler = torch.utils.data.sampler.SubsetRandomSampler(train_indexes)					# 根据给定的indexs随机采集若干个元素的sampler
 				valid_sampler = torch.utils.data.sampler.SubsetRandomSampler(valid_indexes)
 
-			self.train = train_loader_class(
+			self.train = train_loader_class(																# 训练dataloader
 				train_dataset, batch_size=train_batch_size, sampler=train_sampler,
 				num_workers=n_worker, pin_memory=True,
 			)
-			self.valid = torch.utils.data.DataLoader(
+			self.valid = torch.utils.data.DataLoader(														# 验证dataloader
 				valid_dataset, batch_size=test_batch_size, sampler=valid_sampler,
 				num_workers=n_worker, pin_memory=True,
 			)
-		else:
+		else:																								# 当不指定验证size的时候，即仅仅test时，这时候是不需要验证集的
 			if num_replicas is not None:
 				train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, num_replicas, rank)
 				self.train = train_loader_class(
@@ -98,7 +98,7 @@ class ImagenetDataProvider(DataProvider):
 			)
 
 		if self.valid is None:
-			self.valid = self.test
+			self.valid = self.test																			# 验证dataloader
 
 	@staticmethod
 	def name():

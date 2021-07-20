@@ -45,9 +45,9 @@ class RunManager:
             init_models(run_config.model_init)
 
         # net info
-        net_info = get_net_info(self.net, self.run_config.data_provider.data_shape, measure_latency, True)
+        net_info = get_net_info(self.net, self.run_config.data_provider.data_shape, measure_latency, True)          # net_info = {'params': 3.5684, 'flops': 208.976944}
         with open('%s/net_info.txt' % self.path, 'w') as fout:
-            fout.write(json.dumps(net_info, indent=4) + '\n')
+            fout.write(json.dumps(net_info, indent=4) + '\n')                                                       # json.dump 将net_info编码成json对象
             # noinspection PyBroadException
             try:
                 fout.write(self.network.module_str + '\n')

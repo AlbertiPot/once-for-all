@@ -214,7 +214,7 @@ class MyNetwork(MyModule):
 	def get_parameters(self, keys=None, mode='include'):
 		if keys is None:
 			for name, param in self.named_parameters():
-				if param.requires_grad: yield param
+				if param.requires_grad: yield param								# yield 是一个类似 return 的关键字，迭代一次遇到yield时就返回yield后面(右边)的值。重点是：下一次迭代时，从上一次迭代遇到的yield后面的代码(下一行)开始执行。
 		elif mode == 'include':
 			for name, param in self.named_parameters():
 				flag = False
