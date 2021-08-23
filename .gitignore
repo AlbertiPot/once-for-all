@@ -115,3 +115,6 @@ venv.bak/
 /bash/distributed_imagenet.sh
 
 nohup.out
+.tmp
+.torch
+data
