@@ -231,65 +231,6 @@ class MyModule(nn.Module):
 
 
 class MyNetwork(MyModule):
-<<<<<<< HEAD
-	CHANNEL_DIVISIBLE = 8
-
-	def forward(self, x):
-		raise NotImplementedError
-
-	@property
-	def module_str(self):
-		raise NotImplementedError
-
-	@property
-	def config(self):
-		raise NotImplementedError
-
-	@staticmethod
-	def build_from_config(config):
-		raise NotImplementedError
-
-	def zero_last_gamma(self):
-		raise NotImplementedError
-
-	@property
-	def grouped_block_index(self):
-		raise NotImplementedError
-
-	""" implemented methods """
-
-	def set_bn_param(self, momentum, eps, gn_channel_per_group=None, **kwargs):
-		set_bn_param(self, momentum, eps, gn_channel_per_group, **kwargs)
-
-	def get_bn_param(self):
-		return get_bn_param(self)
-
-	def get_parameters(self, keys=None, mode='include'):
-		if keys is None:
-			for name, param in self.named_parameters():
-				if param.requires_grad: yield param								# yield 是一个类似 return 的关键字，迭代一次遇到yield时就返回yield后面(右边)的值。重点是：下一次迭代时，从上一次迭代遇到的yield后面的代码(下一行)开始执行。
-		elif mode == 'include':
-			for name, param in self.named_parameters():
-				flag = False
-				for key in keys:
-					if key in name:
-						flag = True
-						break
-				if flag and param.requires_grad: yield param
-		elif mode == 'exclude':
-			for name, param in self.named_parameters():
-				flag = True
-				for key in keys:
-					if key in name:
-						flag = False
-						break
-				if flag and param.requires_grad: yield param
-		else:
-			raise ValueError('do not support: %s' % mode)
-
-	def weight_parameters(self):
-		return self.get_parameters()
-=======
     CHANNEL_DIVISIBLE = 8
 
     def forward(self, x):
@@ -350,4 +291,3 @@ class MyNetwork(MyModule):
 
     def weight_parameters(self):
         return self.get_parameters()
->>>>>>> 4451593507b0f48a7854763adfe7785705abdd78
